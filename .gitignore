@@ -1,0 +1,8 @@
+# .NET / Visual Studio
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.vscode/
+appsettings.Development.json
