@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 public class Organisation
 {
     public int Id { get; set; }
@@ -8,6 +10,6 @@ public class Organisation
     public string IBAN { get; set; }
     public string Number { get; set; }
     public string CompanyCode { get; set; }
-
-    public List<User> Users { get; set; }
+    [JsonIgnore]
+    public List<User>? Users { get; set; }
 }

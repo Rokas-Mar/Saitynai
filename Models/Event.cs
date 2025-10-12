@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 public class Event
 {
     public int Id { get; set; }
@@ -6,5 +8,6 @@ public class Event
     public string Location { get; set; }
 
     public int UserId { get; set; }
-    public User User { get; set; }
+    [JsonIgnore]
+    public User? User { get; set; }
 }

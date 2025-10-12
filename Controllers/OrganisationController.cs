@@ -27,7 +27,7 @@ public class OrganisationsController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public IActionResult Update(int id, Organisation org)
+    public IActionResult Update(int id, [FromBody] Organisation org)
     {
         if (id != org.Id) return BadRequest();
         var existing = _db.Organisations.Find(id);
