@@ -1,11 +1,11 @@
-# 🏢 OrganisationAPI Demo
+# OrganisationAPI Demo
 
 A simple **ASP.NET Core Web API** project for managing **Organisations**, **Users**, and **Events** with full CRUD functionality and realistic demo data.  
 Includes a ready-to-use **Postman collection** that auto-handles IDs and demonstrates common API errors.
 
 ---
 
-## 🚀 Features
+## Features
 - CRUD endpoints for **Organisations**, **Users**, and **Events**
 - **Entity relationships** (Organisation → Users → Events)
 - **MySQL + Entity Framework Core** integration
