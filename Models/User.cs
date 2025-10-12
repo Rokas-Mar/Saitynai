@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using System.Text.Json.Serialization;
 
 public class User
 {
@@ -10,7 +11,8 @@ public class User
     public string Email { get; set; }
 
     public int OrganisationId { get; set; }
-    public Organisation Organisation { get; set; }
-
-    public List<Event> Events { get; set; }
+    [JsonIgnore]
+    public Organisation? Organisation { get; set; }
+    [JsonIgnore]
+    public List<Event>? Events { get; set; }
 }
