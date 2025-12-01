@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 
+// Put id body neturi buti
+// Prideti 3 lygiu herarchini get
+
 [ApiController]
 [Route("api/[controller]")]
 public class UsersController : ControllerBase
@@ -46,4 +49,15 @@ public class UsersController : ControllerBase
         _db.SaveChanges();
         return NoContent();
     }
+
+	[HttpGet("{id}/events")]
+	public ActionResult<IEnumerable<Event>> GetUserEvents(int id)
+	{
+		var user = _db.Users.Find(id);
+		if (user == null) return NotFound($"User with ID {id} not found.");
+
+		var events = _db.Events.Where(e => e.UserId == id).ToList();
+		return Ok(events);
+	}
+
 }
