@@ -1,56 +1,135 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
+const string CorsPolicy = "AllowFrontend";
+builder.Services.AddCors(options =>
+{
+	options.AddPolicy("AllowFrontend", policy =>
+	{
+		policy
+			.SetIsOriginAllowed(origin =>
+			{
+				var uri = new Uri(origin);
+				return uri.Host.EndsWith("vercel.app")
+					|| origin.StartsWith("http://localhost");
+			})
+			.AllowAnyHeader()
+			.AllowAnyMethod()
+			.AllowCredentials();
+	});
+});
+
+// ====================== DATABASE =======================
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
+
+// ====================== JWT CONFIG =======================
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
+var jwt = builder.Configuration.GetSection("Jwt").Get<JwtSettings>()!;
+var key = Encoding.UTF8.GetBytes(jwt.Key);
+
+builder.Services.AddAuthentication(opts =>
+{
+    opts.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    opts.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(opts =>
+{
+    opts.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwt.Issuer,
+        ValidAudience = jwt.Audience,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
+builder.Services.AddAuthorization();
+
+// ====================== ADD SERVICES =======================
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddHttpContextAccessor();
+
+// ====================== CONTROLLERS & SWAGGER =======================
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
-var connectionString = "server=localhost;port=3306;database=organisationdb;user=root;password=";
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Organisation API", Version = "v1" });
+
+    var jwtSecurityScheme = new OpenApiSecurityScheme
+    {
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        Name = "JWT Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Description = "**ONLY paste your JWT access token here**. Do NOT include 'Bearer'.",
+        Reference = new OpenApiReference
+        {
+            Id = JwtBearerDefaults.AuthenticationScheme,
+            Type = ReferenceType.SecurityScheme
+        }
+    };
+
+    c.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        { jwtSecurityScheme, Array.Empty<string>() }
+    });
+});
 
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.EnsureCreated();
-
-    if (!db.Organisations.Any())
-    {
-        var org1 = new Organisation { Name = "TechCorp", Email = "contact@techcorp.com", Address = "123 Tech Street", PostalCode = "10001", IBAN = "LT123456789012345678", Number = "123456789", CompanyCode = "TC-001" };
-        var org2 = new Organisation { Name = "HealthSolutions", Email = "info@healthsolutions.com", Address = "45 Wellness Ave", PostalCode = "20002", IBAN = "LT987654321098765432", Number = "987654321", CompanyCode = "HS-002" };
-        db.Organisations.AddRange(org1, org2);
-        db.SaveChanges();
-
-        var user1 = new User { Name = "John", Surname = "Doe", Role = "Admin", Number = "555-1234", Email = "john.doe@techcorp.com", OrganisationId = org1.Id };
-        var user2 = new User { Name = "Jane", Surname = "Smith", Role = "Manager", Number = "555-5678", Email = "jane.smith@techcorp.com", OrganisationId = org1.Id };
-        var user3 = new User { Name = "Alice", Surname = "Brown", Role = "Employee", Number = "555-8765", Email = "alice.brown@healthsolutions.com", OrganisationId = org2.Id };
-        db.Users.AddRange(user1, user2, user3);
-        db.SaveChanges();
-
-        var event1 = new Event { Name = "Tech Launch", Date = DateTime.Now.AddDays(7), Location = "TechCorp HQ", UserId = user1.Id };
-        var event2 = new Event { Name = "Annual Meeting", Date = DateTime.Now.AddDays(30), Location = "Conference Center", UserId = user2.Id };
-        var event3 = new Event { Name = "Health Workshop", Date = DateTime.Now.AddDays(14), Location = "Wellness Hall", UserId = user3.Id };
-        db.Events.AddRange(event1, event2, event3);
-        db.SaveChanges();
-    }
+	var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+	db.Database.Migrate();      // apply migrations automatically
+	DbSeeder.Seed(db);         // seed if empty
 }
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.EnsureCreated();
-}
-
+// ====================== PIPELINE =======================
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseCors(CorsPolicy);
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
+
+app.UseCookiePolicy(new CookiePolicyOptions
+{
+	MinimumSameSitePolicy = SameSiteMode.None,
+	Secure = CookieSecurePolicy.Always
+});
+
+app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
+
 app.Run();
+
+public class JwtSettings
+{
+    public string Key { get; set; } = null!;
+    public string Issuer { get; set; } = null!;
+    public string Audience { get; set; } = null!;
+    public int ExpireMinutes { get; set; }
+}

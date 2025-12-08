@@ -1,0 +1,401 @@
+{
+	"info": {
+		"_postman_id": "def0e679-517a-4757-979c-902e1e72bb95",
+		"name": "OrganisationAPI Demo (Auto-ID, Logical Data)",
+		"description": "Collection to demo all 16 API endpoints for Organisations, Users, and Events, including a new endpoint to get all events for a user.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33697247",
+		"_collection_link": "https://crimson-zodiac-330510.postman.co/workspace/Team-Workspace~c385b03f-27d3-4aa4-81d1-8f2176c1bab3/collection/33697247-def0e679-517a-4757-979c-902e1e72bb95?action=share&source=collection_link&creator=33697247"
+	},
+	"item": [
+		{
+			"name": "Get All Organisations",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5154/api/organisations",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "5154",
+					"path": ["api", "organisations"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Organisation by ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5154/api/organisations/{{organisationId}}",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "5154",
+					"path": ["api", "organisations", "{{organisationId}}"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Organisation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.environment.set(\"organisationId\", jsonData.id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [{ "key": "Content-Type", "value": "application/json" }],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Acme Corporation\",\n  \"email\": \"info@acmecorp.com\",\n  \"address\": \"100 Innovation Drive\",\n  \"postalCode\": \"12345\",\n  \"IBAN\": \"LT123456789012345678\",\n  \"number\": \"+37060012345\",\n  \"companyCode\": \"ACME-001\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:5154/api/organisations",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "5154",
+					"path": ["api", "organisations"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Organisation",
+			"request": {
+				"method": "PUT",
+				"header": [{ "key": "Content-Type", "value": "application/json" }],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id\": {{organisationId}},\n  \"name\": \"Acme Corp International\",\n  \"email\": \"contact@acme-int.com\",\n  \"address\": \"200 Global Blvd\",\n  \"postalCode\": \"54321\",\n  \"IBAN\": \"LT987654321098765432\",\n  \"number\": \"+37060054321\",\n  \"companyCode\": \"ACME-002\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:5154/api/organisations/{{organisationId}}",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "5154",
+					"path": ["api", "organisations", "{{organisationId}}"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Organisation",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5154/api/organisations/{{organisationId}}",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "5154",
+					"path": ["api", "organisations", "{{organisationId}}"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Users",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5154/api/users",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "5154",
+					"path": ["api", "users"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get User by ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5154/api/users/{{userId}}",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "5154",
+					"path": ["api", "users", "{{userId}}"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get User Events",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5154/api/users/{{userId}}/events",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "5154",
+					"path": ["api", "users", "{{userId}}", "events"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.environment.set(\"userId\", jsonData.id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [{ "key": "Content-Type", "value": "application/json" }],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\":\"John\",\n  \"surname\":\"Doe\",\n  \"role\":\"Manager\",\n  \"number\":\"+37060067890\",\n  \"email\":\"john.doe@acmecorp.com\",\n  \"organisationId\": 2\n}"
+				},
+				"url": {
+					"raw": "http://localhost:5154/api/users",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "5154",
+					"path": ["api", "users"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update User",
+			"request": {
+				"method": "PUT",
+				"header": [{ "key": "Content-Type", "value": "application/json" }],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id\": {{userId}},\n  \"name\":\"John\",\n  \"surname\":\"Doe\",\n  \"role\":\"Director\",\n  \"number\":\"+37060098765\",\n  \"email\":\"john.doe@acme-int.com\",\n  \"organisationId\": 2\n}"
+				},
+				"url": {
+					"raw": "http://localhost:5154/api/users/{{userId}}",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "5154",
+					"path": ["api", "users", "{{userId}}"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete User",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5154/api/users/{{userId}}",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "5154",
+					"path": ["api", "users", "{{userId}}"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Events",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5154/api/events",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "5154",
+					"path": ["api", "events"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Event by ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5154/api/events/{{eventId}}",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "5154",
+					"path": ["api", "events", "{{eventId}}"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Event",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.environment.set(\"eventId\", jsonData.id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [{ "key": "Content-Type", "value": "application/json" }],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\":\"Annual Meeting\",\n  \"date\":\"2025-12-15T09:00:00\",\n  \"location\":\"Acme HQ Conference Room\",\n  \"userId\": 8\n}"
+				},
+				"url": {
+					"raw": "http://localhost:5154/api/events",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "5154",
+					"path": ["api", "events"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Event",
+			"request": {
+				"method": "PUT",
+				"header": [{ "key": "Content-Type", "value": "application/json" }],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id\": {{eventId}},\n  \"name\":\"Annual Strategy Meeting\",\n  \"date\":\"2025-12-16T10:00:00\",\n  \"location\":\"Acme HQ Board Room\",\n  \"userId\": 8\n}"
+				},
+				"url": {
+					"raw": "http://localhost:5154/api/events/{{eventId}}",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "5154",
+					"path": ["api", "events", "{{eventId}}"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Event",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5154/api/events/{{eventId}}",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "5154",
+					"path": ["api", "events", "{{eventId}}"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fail 404",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 404 Not Found\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5154/api/users/999",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "5154",
+					"path": ["api", "users", "999"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fail 405",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 405 Method Not Allowed\", function () {",
+							"    pm.response.to.have.status(405);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5154/api/users/",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "5154",
+					"path": ["api", "users", ""]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fail 415",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 415 Unsupported Media Type\", function () {",
+							"    pm.response.to.have.status(415);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5154/api/users/",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "5154",
+					"path": ["api", "users", ""]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{ "key": "organisationId", "value": "" },
+		{ "key": "userId", "value": "" },
+		{ "key": "eventId", "value": "" }
+	]
+}

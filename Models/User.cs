@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging;
 using System.Text.Json.Serialization;
 
 public class User
@@ -9,6 +8,8 @@ public class User
     public string Role { get; set; }
     public string Number { get; set; }
     public string Email { get; set; }
+
+    public string Password { get; set; }
 
     public int OrganisationId { get; set; }
     [JsonIgnore]
